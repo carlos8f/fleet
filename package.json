@@ -1,7 +1,7 @@
 {
     "name" : "s8fleet",
     "description" : "Tweaked version of substack's fleet module",
-    "version" : "0.0.1",
+    "version" : "0.0.2-carlos8f",
     "repository" : {
         "type" : "git",
         "url" : "git://github.com/carlos8f/fleet.git"
