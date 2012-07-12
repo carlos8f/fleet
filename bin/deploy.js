@@ -36,7 +36,7 @@ function deploy (hub, opts) {
     var ref = 'http://' + argv.hub.split(':')[0]
         + ':' + hub.ports.git + '/' + opts.repo;
     
-    git.push(ref, function (err) {
+    git.push({remote: ref, branch: argv.branch, force: argv.force}, function (err) {
         if (err) {
             console.error(err);
             p.hub.close();
