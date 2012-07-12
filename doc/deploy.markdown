@@ -15,6 +15,8 @@ directory.
 * commit - Push a particular commit by hash. Defaults to the latest commit.
 * repo - Push code into this repo name. Defaults to the closest directory name
   with a `.git/` in it.
+* branch - Select the branch to push. Defaults to the current branch.
+* force - Whether to perform a force update. Defaults to false.
 
 If you haven't set a remote with `s8fleet remote`, you'll need to specify these
 options:
