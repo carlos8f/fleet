@@ -46,7 +46,7 @@ function deploy (hub, opts) {
                 errors.forEach(function (err) {
                     console.error(
                         '[' + err.drone + '] '
-                        + (err.code === 128 ? 'already at latest' : err)
+                        + (err.code === 128 ? 'already at latest' : JSON.serialize(err))
                     );
                 });
             }
