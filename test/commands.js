@@ -13,6 +13,7 @@ var dir = {
 };
 var procs = { hub : null, drone : [] };
 var port = Math.floor(Math.random() * ((1<<16) - 1e4)) + 1e4;
+var pids = [];
 
 dir.drone.concat(dir.hub).forEach(function (x) { 
     mkdirp.sync(x);
@@ -52,7 +53,7 @@ test('git init, git add, git commit, fleet remote add, fleet deploy, fleet spawn
             ps.on('exit', this.ok);
         })
         .seq(function () {
-            fs.writeFile(dir.gitRepo + '/server.js', 'console.log("Hello World!")', this);
+            fs.writeFile(dir.gitRepo + '/server.js', 'console.log("Hello World!"); process.stdin.pipe(process.stdout);', this);
         })
         .seq(function () {
             spawn('git', [ 'add', 'server.js' ]).on('exit', this.ok);
@@ -94,20 +95,40 @@ test('git init, git add, git commit, fleet remote add, fleet deploy, fleet spawn
 });
 
 test('fleet ps', function (t) {
-    t.plan(2);
+    t.plan(3);
     var ps = fleet('ps.js', [], { cwd: dir.gitRepo } );
     ps.stderr.pipe(process.stderr, { end : false });
-    var output = '';
+    var output = ''
     ps.stdout.on('data', function (data) {
         output += data;
     });
     ps.stdout.on('end', function () {
+        pids = output.match(/(pid#[0-9a-z]+)/g);
+        t.equal(pids.length, procs.drone.length, 'pid count matches drone count');
         t.equal(output.match(/drone/g).length, procs.drone.length, 'drone should be matched in ps');
     });
     ps.on('exit', function (code, signal) {
         t.ok(true, 'fleet ps');
     });
-})
+});
+
+test('fleet stop', function(t) {
+    t.plan(4);
+    var ps = fleet('stop.js', pids, { cwd: dir.gitRepo } );
+    ps.stderr.pipe(process.stderr, { end : false });
+    var output = ''
+    ps.stdout.on('data', function (data) {
+        output += data;
+    });
+    ps.stdout.on('end', function () {
+        pids.forEach(function(pid) {
+            t.ok(new RegExp(pid.replace('pid#', '')).test(output), pid + ' stopped');
+        });
+    });
+    ps.on('exit', function (code, signal) {
+        t.ok(true, 'fleet stop');
+    });
+});
 
 test('fleet drone stop', function (t) {
     procs.drone.forEach(function (drone) {
