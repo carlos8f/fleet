@@ -19,7 +19,7 @@ p.hub(function (hub) {
     var opts = {
         drone : argv.drone || '*',
         drones : argv.drones,
-        pid : argv.all ? '*' : argv._.slice(1).map(function (x) { return x.toString().replace(/^pid#/, '') }),
+        pid : argv.all ? '*' : argv._.map(function (x) { return x.toString().replace(/^pid#/, '') }),
         commit : argv.commit,
     };
     hub.stop(opts, function (err, drones) {
